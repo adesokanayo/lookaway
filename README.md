@@ -12,6 +12,15 @@ The 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds. The [Amer
 
 **Windows** — unzip, run `Lookaway.exe`. Icon sits in the tray. SmartScreen: More info → Run anyway.
 
+**Gophers**
+
+```bash
+go install github.com/adesokanayo/lookaway@latest
+lookaway
+```
+
+Mac needs Xcode CLT (`xcode-select --install`). Windows: `CGO_ENABLED=0 go install github.com/adesokanayo/lookaway@latest`.
+
 ```bash
 git clone https://github.com/adesokanayo/lookaway.git
 cd lookaway
