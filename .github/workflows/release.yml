@@ -1,0 +1,27 @@
+name: Release DMG
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dmg:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build DMG
+        run: ./scripts/package-dmg.sh
+        env:
+          VERSION: ${{ github.event.release.tag_name || 'dev' }}
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.dmg
