@@ -2,6 +2,8 @@
 
 Every 20 minutes, the screen locks so you look ~20 feet away for 20 seconds.
 
+I built this because I sit on a laptop all day and my eyes get fried. Notifications were too easy to swipe away. I wanted something that actually takes the screen for 20 seconds.
+
 [Download](https://github.com/adesokanayo/lookaway/releases/latest)
 
 **Mac** — open the DMG, drag to Applications. If macOS blocks it: Control-click → Open.
