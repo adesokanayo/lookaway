@@ -68,7 +68,7 @@ func (o *Overlay) Show(remain time.Duration) {
 		title.SetFrame(rectOf((w-720)/2, h*0.58, 720, 56))
 		content.AddSubview(title)
 
-		body := styledLabel("Focus on something about 20 feet away.\nA far wall, a window, or outside.", muted, 20, false)
+		body := styledLabel("Look about 20 feet away.", muted, 20, false)
 		body.SetFrame(rectOf((w-720)/2, h*0.48, 720, 64))
 		content.AddSubview(body)
 
@@ -79,11 +79,7 @@ func (o *Overlay) Show(remain time.Duration) {
 		item.countdown = count
 
 		if isPrimary {
-			hint := styledLabel("Blink fully. Let the focusing muscles in your eyes rest.", muted, 16, false)
-			hint.SetFrame(rectOf((w-720)/2, h*0.22, 720, 28))
-			content.AddSubview(hint)
-
-			skip := appkit.NewButtonWithTitle("Skip this break")
+			skip := appkit.NewButtonWithTitle("Skip")
 			skip.SetBezelStyle(appkit.BezelStyleInline)
 			skip.SetFrame(rectOf((w-180)/2, h*0.14, 180, 32))
 			action.Set(skip, func(sender objc.Object) {

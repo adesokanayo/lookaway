@@ -105,13 +105,10 @@ func drawOverlay(hdc uintptr, rc rect, o *Overlay) {
 	drawCentered(hdc, titleFont, "Look away", 0, h/6, w, h/8)
 
 	procSetTextColor.Call(hdc, uintptr(rgb(178, 188, 199)))
-	drawCentered(hdc, bodyFont, "Focus on something about 20 feet away.\nA far wall, a window, or outside.", 0, h/3, w, h/8)
+	drawCentered(hdc, bodyFont, "Look about 20 feet away.", 0, h/3, w, h/8)
 
 	procSetTextColor.Call(hdc, uintptr(rgb(245, 247, 250)))
 	drawCentered(hdc, countFont, formatSeconds(o.remain), 0, h/2-40, w, h/6)
-
-	procSetTextColor.Call(hdc, uintptr(rgb(178, 188, 199)))
-	drawCentered(hdc, hintFont, "Blink fully. Let the focusing muscles in your eyes rest.\nClick Skip or press Esc if you must.", 0, (h*7)/10, w, h/8)
 
 	skip := rect{
 		left:   w/2 - 110,
@@ -120,7 +117,7 @@ func drawOverlay(hdc uintptr, rc rect, o *Overlay) {
 		bottom: (h*17)/20 + 40,
 	}
 	o.skipRect = skip
-	drawCentered(hdc, hintFont, "Skip this break", skip.left, skip.top, skip.right-skip.left, skip.bottom-skip.top)
+	drawCentered(hdc, hintFont, "Skip", skip.left, skip.top, skip.right-skip.left, skip.bottom-skip.top)
 }
 
 func drawCentered(hdc uintptr, font uintptr, text string, x, y, w, h int32) {

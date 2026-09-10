@@ -2,7 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-version="${VERSION:-1.1.0}"
+version="${VERSION:-1.1.1}"
 dist="$root/dist"
 mkdir -p "$dist"
 
@@ -12,21 +12,13 @@ mkdir -p "$dist"
 )
 
 cat > "$dist/README-Windows.txt" << EOF
-Lookaway ${version} for Windows
-================================
+Lookaway ${version}
 
-1. Copy Lookaway.exe wherever you like (Desktop or a folder).
-2. Double-click Lookaway.exe. A tray icon appears near the clock.
-3. Right-click the tray icon to start a break, pause, skip, or quit.
+Run Lookaway.exe. Tray icon by the clock. Right-click for Break now, Pause, Skip, Quit.
 
-If Windows SmartScreen warns that the app is unrecognized, choose
-More info -> Run anyway. The build is not Authenticode-signed yet.
+SmartScreen: More info -> Run anyway.
 
-Every 20 minutes Lookaway covers every monitor and asks you to look
-about 20 feet away for 20 seconds.
-
-Source: https://github.com/adesokanayo/lookaway
-License: MIT
+https://github.com/adesokanayo/lookaway
 EOF
 
 (

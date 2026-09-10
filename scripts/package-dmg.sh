@@ -2,7 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-version="${VERSION:-1.1.0}"
+version="${VERSION:-1.1.1}"
 dist="$root/dist"
 stage="$dist/dmg"
 app="$stage/Lookaway.app"

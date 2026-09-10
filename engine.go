@@ -22,8 +22,7 @@ const (
 	EventBreakFinished
 )
 
-// Engine is the 20-20-20 state machine. It is safe for concurrent use and
-// has no GUI dependencies so it can be unit tested on any platform.
+// Engine is the 20-20-20 timer.
 type Engine struct {
 	Work  time.Duration
 	Break time.Duration

@@ -73,12 +73,12 @@ func (a *App) handleEvent(ev Event) {
 
 func (a *App) refresh() {
 	remain := a.engine.Remaining()
-	tip := "Lookaway · next break in " + formatClock(remain)
+	tip := "Lookaway " + formatClock(remain)
 	switch a.engine.Phase() {
 	case PhaseBreak:
-		tip = "Lookaway · looking away " + formatSeconds(remain) + "s"
+		tip = "Lookaway " + formatSeconds(remain) + "s"
 	case PhasePaused:
-		tip = "Lookaway · paused · " + formatClock(remain) + " left"
+		tip = "Lookaway paused " + formatClock(remain)
 	}
 	setTip(&a.nid, tip)
 	notifyIcon(nimModify, &a.nid)
@@ -89,23 +89,23 @@ func (a *App) showMenu() {
 	procGetCursorPos.Call(uintptr(unsafe.Pointer(&pt)))
 	menu, _, _ := procCreatePopupMenu.Call()
 
-	status := "Next break in " + formatClock(a.engine.Remaining())
-	pause := "Pause timer"
+	status := "Next " + formatClock(a.engine.Remaining())
+	pause := "Pause"
 	switch a.engine.Phase() {
 	case PhaseBreak:
-		status = "Looking away for " + formatSeconds(a.engine.Remaining()) + "s"
+		status = "Break " + formatSeconds(a.engine.Remaining()) + "s"
 	case PhasePaused:
-		status = "Paused · " + formatClock(a.engine.Remaining()) + " left"
-		pause = "Resume timer"
+		status = "Paused " + formatClock(a.engine.Remaining())
+		pause = "Resume"
 	}
 
 	appendMenu(menu, mfString|mfGrayed, 0, status)
 	appendMenu(menu, mfSeparator, 0, "")
-	appendMenu(menu, mfString, idStartBreak, "Start break now")
+	appendMenu(menu, mfString, idStartBreak, "Break now")
 	appendMenu(menu, mfString, idPause, pause)
-	appendMenu(menu, mfString, idSkip, "Skip current break")
+	appendMenu(menu, mfString, idSkip, "Skip")
 	appendMenu(menu, mfSeparator, 0, "")
-	appendMenu(menu, mfString, idQuit, "Quit Lookaway")
+	appendMenu(menu, mfString, idQuit, "Quit")
 
 	procSetForegroundWindow.Call(a.hwnd)
 	procTrackPopupMenu.Call(menu, tpmRightButton, uintptr(pt.x), uintptr(pt.y), 0, a.hwnd, 0)

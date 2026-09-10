@@ -71,13 +71,13 @@ func (a *App) installMenu(nsapp appkit.Application) {
 	menu.AddItem(a.nextItem)
 
 	menu.AddItem(appkit.MenuItem_SeparatorItem())
-	menu.AddItem(appkit.NewMenuItemWithAction("Start break now", "", func(sender objc.Object) {
+	menu.AddItem(appkit.NewMenuItemWithAction("Break now", "", func(sender objc.Object) {
 		if a.engine.StartBreak() == EventBreakStarted {
 			a.overlay.Show(a.engine.Remaining())
 			a.refresh()
 		}
 	}))
-	a.pauseItem = appkit.NewMenuItemWithAction("Pause timer", "", func(sender objc.Object) {
+	a.pauseItem = appkit.NewMenuItemWithAction("Pause", "", func(sender objc.Object) {
 		if a.engine.Phase() == PhasePaused {
 			a.engine.Resume()
 		} else {
@@ -86,14 +86,14 @@ func (a *App) installMenu(nsapp appkit.Application) {
 		a.refresh()
 	})
 	menu.AddItem(a.pauseItem)
-	menu.AddItem(appkit.NewMenuItemWithAction("Skip current break", "", func(sender objc.Object) {
+	menu.AddItem(appkit.NewMenuItemWithAction("Skip", "", func(sender objc.Object) {
 		if a.engine.SkipBreak() == EventBreakFinished {
 			a.overlay.Hide()
 			a.refresh()
 		}
 	}))
 	menu.AddItem(appkit.MenuItem_SeparatorItem())
-	menu.AddItem(appkit.NewMenuItemWithAction("Quit Lookaway", "q", func(sender objc.Object) {
+	menu.AddItem(appkit.NewMenuItemWithAction("Quit", "q", func(sender objc.Object) {
 		a.overlay.Hide()
 		nsapp.Terminate(nil)
 	}))
@@ -106,17 +106,17 @@ func (a *App) refresh() {
 	remain := a.engine.Remaining()
 	phase := a.engine.Phase()
 	title := formatClock(remain)
-	next := "Next break in " + formatClock(remain)
-	pause := "Pause timer"
+	next := "Next break " + formatClock(remain)
+	pause := "Pause"
 
 	switch phase {
 	case PhaseBreak:
 		title = formatSeconds(remain) + "s"
-		next = "Looking away for " + formatSeconds(remain) + "s"
+		next = "Break " + formatSeconds(remain) + "s"
 	case PhasePaused:
 		title = "Paused"
-		next = "Paused · " + formatClock(remain) + " left"
-		pause = "Resume timer"
+		next = "Paused " + formatClock(remain)
+		pause = "Resume"
 	}
 
 	a.status.Button().SetTitle(title)

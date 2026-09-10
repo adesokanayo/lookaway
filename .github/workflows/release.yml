@@ -41,7 +41,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          printf '%s\n' 'Lookaway for Windows' '' 'Double-click Lookaway.exe. A tray icon appears near the clock.' '' 'https://github.com/adesokanayo/lookaway' > dist/README-Windows.txt
+          printf '%s\n' 'Lookaway' 'Run Lookaway.exe. Tray icon by the clock.' 'https://github.com/adesokanayo/lookaway' > dist/README-Windows.txt
           cd dist
           version="${{ github.event.release.tag_name || 'dev' }}"
           7z a "Lookaway-windows-amd64-${version}.zip" Lookaway.exe README-Windows.txt
