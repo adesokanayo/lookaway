@@ -2,15 +2,29 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-0F766E.svg)](LICENSE)
 
-A free, **open-source** macOS menu bar app that enforces the **20-20-20 rule** by blocking every screen and asking you to look into the distance.
+A free, **open-source** app for macOS and Windows that enforces the **20-20-20 rule** by blocking every screen and asking you to look into the distance.
 
-## Install (DMG)
+## Install
 
-1. Download **Lookaway-1.0.0.dmg** from the [latest release](https://github.com/adesokanayo/lookaway/releases/latest).
+Download a build from the [latest release](https://github.com/adesokanayo/lookaway/releases/latest).
+
+### macOS
+
+1. Download **Lookaway-1.1.0.dmg**.
 2. Open the DMG and drag **Lookaway** into **Applications**.
-3. Open Lookaway from Applications (or Spotlight). An eye icon appears in the menu bar.
+3. Open Lookaway. An eye icon appears in the menu bar.
 
-The first launch may be blocked because the app is not yet Apple-notarized. In Finder, Control-click Lookaway → **Open** → **Open**. After that, macOS will remember your choice.
+If macOS blocks the first launch, Control-click Lookaway → **Open** → **Open**. The Mac build is not Apple-notarized yet.
+
+### Windows
+
+1. Download **Lookaway-windows-amd64-1.1.0.zip**.
+2. Unzip and double-click **Lookaway.exe**.
+3. A tray icon appears near the clock. Right-click it for Start break, Pause, Skip, or Quit.
+
+If SmartScreen says the app is unrecognized, choose **More info** → **Run anyway**. The Windows build is not Authenticode-signed yet.
+
+Pin the exe to startup if you want it every time you log in: `shell:startup` in Explorer’s address bar, then drop a shortcut to Lookaway.exe.
 
 ## Why this is open source
 
@@ -21,10 +35,8 @@ That matters for an app that **takes over your screen**:
 - **Trust.** You can read the Go source and see that the overlay is a timer, not a keylogger, ad injector, or telemetry collector. Nothing phones home.
 - **No paywall on a health habit.** The 20-20-20 rule should not be locked behind a subscription.
 - **Fix and fork.** If you want a 15-minute interval, a different message, or Linux support, you can change it or send a pull request.
-- **Longevity.** If the original maintainer stops, the code stays public. The habit does not die with an App Store listing.
-- **Reuse.** Other developers can learn how to build a native Mac overlay in Go with [DarwinKit](https://github.com/progrium/darwinkit).
-
-Commercial screen-break tools often stay closed. That hides what they do while they have the highest window level on your machine. Open source flips that: the most privileged UI is also the most inspectable.
+- **Longevity.** If the original maintainer stops, the code stays public.
+- **Reuse.** The Mac overlay uses [DarwinKit](https://github.com/progrium/darwinkit). The Windows overlay uses the Win32 API (`CreateWindowEx`, `HWND_TOPMOST`, tray `Shell_NotifyIcon`) with no extra GUI toolkit.
 
 ## Why 20-20-20
 
@@ -40,26 +52,26 @@ A 2023 *Contact Lens and Anterior Eye* study found the rule increased break freq
 
 ## What the app does
 
-- Lives in the menu bar (no Dock icon)
+- Lives in the macOS menu bar or the Windows system tray
 - Counts down 20 minutes of work
-- Then covers **all displays**, including the menu bar, with a high-level overlay
+- Then covers **all displays** with a topmost overlay
 - Asks you to look 20 feet away while a 20-second timer runs
 - Restarts automatically after the break
 - Lets you start a break early, pause the timer, or skip if you must
 
-The overlay uses native AppKit (`NSPanel` at `NSScreenSaverWindowLevel`) via DarwinKit, so it can sit above other apps — including fullscreen ones.
+On a Mac the overlay is an AppKit panel at screensaver window level. On Windows it is a topmost popup covering the virtual desktop (every monitor).
 
 ## Menu
 
 - **Next break in…** — time until the overlay
 - **Start break now** — block the screen immediately
 - **Pause timer / Resume timer**
-- **Skip current break** — also available on the overlay
+- **Skip current break** — also on the overlay (Esc on Windows)
 - **Quit Lookaway**
 
 ## Build from source
 
-You need Go 1.21+ and the Xcode command line tools.
+You need Go 1.21+. On a Mac, also install the Xcode command line tools.
 
 ```bash
 git clone https://github.com/adesokanayo/lookaway.git
@@ -68,24 +80,24 @@ go test ./...
 go run .
 ```
 
-Use **Start break now** to try the full-screen block immediately.
-
 Shorter intervals while you test:
 
 ```bash
 LOOKAWAY_WORK=30s LOOKAWAY_BREAK=20s go run .
 ```
 
-Build the installer on a Mac:
+Installers:
 
 ```bash
-./scripts/package-dmg.sh
-# output: dist/Lookaway-1.0.0.dmg
+./scripts/package-dmg.sh          # Mac: dist/Lookaway-1.1.0.dmg
+./scripts/package-windows.sh      # Windows: dist/Lookaway-windows-amd64-1.1.0.zip
 ```
+
+The Windows zip can be built from macOS; it does not need CGO.
 
 ## Limits
 
-macOS can still show the lock screen, Force Quit (`Option-Command-Escape`), and some system UI above almost anything. That is intentional so you are never locked out of the computer.
+The lock screen, Task Manager, Force Quit, and some system UI can still appear above the overlay. That is intentional so you are never locked out of the computer.
 
 This is not a substitute for an eye exam, glasses, lighting changes, or less total screen time.
 

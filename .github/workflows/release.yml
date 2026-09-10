@@ -1,4 +1,4 @@
-name: Release DMG
+name: Release installers
 
 on:
   release:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  dmg:
+  macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,3 +25,28 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.dmg
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Test
+        run: go test ./...
+      - name: Build exe
+        run: go build -ldflags="-s -w -H windowsgui" -o dist/Lookaway.exe .
+      - name: Zip
+        shell: bash
+        run: |
+          mkdir -p dist
+          printf '%s\n' 'Lookaway for Windows' '' 'Double-click Lookaway.exe. A tray icon appears near the clock.' '' 'https://github.com/adesokanayo/lookaway' > dist/README-Windows.txt
+          cd dist
+          version="${{ github.event.release.tag_name || 'dev' }}"
+          7z a "Lookaway-windows-amd64-${version}.zip" Lookaway.exe README-Windows.txt
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip

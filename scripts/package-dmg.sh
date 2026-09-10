@@ -2,12 +2,12 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-version="${VERSION:-1.0.0}"
+version="${VERSION:-1.1.0}"
 dist="$root/dist"
 stage="$dist/dmg"
 app="$stage/Lookaway.app"
 
-rm -rf "$dist"
+rm -rf "$stage"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 
 (
