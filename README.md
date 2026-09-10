@@ -8,7 +8,7 @@ The 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds. The [Amer
 
 [Download](https://github.com/adesokanayo/lookaway/releases/latest)
 
-**Mac** — open the DMG, drag to Applications. If macOS blocks it: Control-click → Open.
+**Mac** — open the DMG and run `Install Lookaway.command` (or drag the app to Applications). Apple will warn it is unsigned. System Settings → Privacy & Security → Open Anyway. Or: `xattr -cr /Applications/Lookaway.app` then open it.
 
 **Windows** — unzip, run `Lookaway.exe`. Icon sits in the tray. SmartScreen: More info → Run anyway.
 
