@@ -12,6 +12,8 @@ The 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds. The [Amer
 
 **Windows** — unzip, run `Lookaway.exe`. Icon sits in the tray. SmartScreen: More info → Run anyway.
 
+Unlocking the machine (or waking from sleep) starts a fresh 20 minutes. Lock-screen time does not count.
+
 **Gophers**
 
 ```bash

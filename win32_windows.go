@@ -14,6 +14,7 @@ var (
 	kernel32 = windows.NewLazySystemDLL("kernel32.dll")
 	shell32  = windows.NewLazySystemDLL("shell32.dll")
 	winmm    = windows.NewLazySystemDLL("winmm.dll")
+	wtsapi32 = windows.NewLazySystemDLL("wtsapi32.dll")
 
 	procRegisterClassExW    = user32.NewProc("RegisterClassExW")
 	procCreateWindowExW     = user32.NewProc("CreateWindowExW")
@@ -53,9 +54,11 @@ var (
 	procSetBkMode        = gdi32.NewProc("SetBkMode")
 	procSetTextColor     = gdi32.NewProc("SetTextColor")
 
-	procGetModuleHandleW = kernel32.NewProc("GetModuleHandleW")
-	procShellNotifyIconW = shell32.NewProc("Shell_NotifyIconW")
-	procPlaySoundW       = winmm.NewProc("PlaySoundW")
+	procGetModuleHandleW                 = kernel32.NewProc("GetModuleHandleW")
+	procShellNotifyIconW                 = shell32.NewProc("Shell_NotifyIconW")
+	procPlaySoundW                       = winmm.NewProc("PlaySoundW")
+	procWTSRegisterSessionNotification   = wtsapi32.NewProc("WTSRegisterSessionNotification")
+	procWTSUnRegisterSessionNotification = wtsapi32.NewProc("WTSUnRegisterSessionNotification")
 )
 
 const (
@@ -74,18 +77,26 @@ const (
 	smCXVirtualScreen = 78
 	smCYVirtualScreen = 79
 
-	wmDestroy    = 0x0002
-	wmClose      = 0x0010
-	wmPaint      = 0x000F
-	wmCommand    = 0x0111
-	wmLButtonUp  = 0x0202
-	wmRButtonUp  = 0x0205
-	wmKeyDown    = 0x0100
-	wmSetCursor  = 0x0020
-	wmApp        = 0x8000
-	wmTray       = wmApp + 1
-	wmAppRefresh = wmApp + 2
-	wmNull       = 0x0000
+	wmDestroy          = 0x0002
+	wmClose            = 0x0010
+	wmPaint            = 0x000F
+	wmCommand          = 0x0111
+	wmLButtonUp        = 0x0202
+	wmRButtonUp        = 0x0205
+	wmKeyDown          = 0x0100
+	wmSetCursor        = 0x0020
+	wmApp              = 0x8000
+	wmTray             = wmApp + 1
+	wmAppRefresh       = wmApp + 2
+	wmNull             = 0x0000
+	wmWTSSessionChange = 0x02B1
+	wmPowerBroadcast   = 0x0218
+
+	wtsSessionUnlock  = 0x8
+	notifyThisSession = 0
+
+	pbtAPMResumeAutomatic = 0x12
+	pbtAPMResumeSuspend   = 0x7
 
 	nimAdd     = 0
 	nimModify  = 1
@@ -301,6 +312,14 @@ func playBreakSound() {
 		0,
 		sndAsync|sndAlias,
 	)
+}
+
+func registerSessionNotify(hwnd uintptr) {
+	procWTSRegisterSessionNotification.Call(hwnd, notifyThisSession)
+}
+
+func unregisterSessionNotify(hwnd uintptr) {
+	procWTSUnRegisterSessionNotification.Call(hwnd)
 }
 
 func notifyIcon(action uint32, nid *notifyIconData) {

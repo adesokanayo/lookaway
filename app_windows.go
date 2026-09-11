@@ -42,6 +42,7 @@ func startApp() {
 	}
 	setTip(&a.nid, "Lookaway")
 	notifyIcon(nimAdd, &a.nid)
+	registerSessionNotify(a.hwnd)
 	a.refresh()
 
 	go func() {
@@ -54,8 +55,15 @@ func startApp() {
 	}()
 
 	messageLoop()
+	unregisterSessionNotify(a.hwnd)
 	notifyIcon(nimDelete, &a.nid)
 	a.overlay.Hide()
+}
+
+func (a *App) onUnlocked() {
+	a.engine.ResetWork()
+	a.overlay.Hide()
+	a.refresh()
 }
 
 func (a *App) handleEvent(ev Event) {
@@ -156,7 +164,18 @@ func trayWindowProc(hwnd uintptr, msg uint32, wParam, lParam uintptr) uintptr {
 		}
 		a.handleEvent(Event(wParam))
 		return 0
+	case wmWTSSessionChange:
+		if wParam == wtsSessionUnlock {
+			a.onUnlocked()
+		}
+		return 0
+	case wmPowerBroadcast:
+		if wParam == pbtAPMResumeAutomatic || wParam == pbtAPMResumeSuspend {
+			a.onUnlocked()
+		}
+		return 0
 	case wmDestroy:
+		unregisterSessionNotify(hwnd)
 		postQuit()
 		return 0
 	}

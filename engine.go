@@ -130,6 +130,16 @@ func (e *Engine) Resume() {
 	e.deadline = e.now().Add(e.savedRemain)
 }
 
+// ResetWork starts a fresh work interval. Used after unlock or wake
+// so lock-screen time does not count as looking at the display.
+func (e *Engine) ResetWork() {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.priorPhase = PhaseWork
+	e.savedRemain = 0
+	e.enterWorkLocked()
+}
+
 func (e *Engine) enterBreakLocked() {
 	e.phase = PhaseBreak
 	e.deadline = e.now().Add(e.Break)

@@ -7,6 +7,7 @@ void lookawayOnBreakNow(void);
 void lookawayOnPause(void);
 void lookawayOnSkip(void);
 void lookawayOnQuit(void);
+void lookawayOnUnlocked(void);
 
 static NSStatusItem *gStatus;
 static NSMenuItem *gNextItem;
@@ -150,6 +151,23 @@ void LookawayRunApp(void) {
 		}
 		gNextItem.target = nil;
 		gStatus.menu = menu;
+
+		NSDistributedNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
+		[dnc addObserverForName:@"com.apple.screenIsUnlocked"
+		                 object:nil
+		                  queue:[NSOperationQueue mainQueue]
+		             usingBlock:^(NSNotification *note) {
+			             (void)note;
+			             lookawayOnUnlocked();
+		             }];
+		[[[NSWorkspace sharedWorkspace] notificationCenter]
+			addObserverForName:NSWorkspaceDidWakeNotification
+			            object:nil
+			             queue:[NSOperationQueue mainQueue]
+			        usingBlock:^(NSNotification *note) {
+				        (void)note;
+				        lookawayOnUnlocked();
+			        }];
 
 		lookawayOnReady();
 		[NSApp run];
