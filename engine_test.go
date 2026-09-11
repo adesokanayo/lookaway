@@ -80,3 +80,37 @@ func TestPauseFreezesRemaining(t *testing.T) {
 		t.Fatalf("resumed remaining = %v", got)
 	}
 }
+
+func TestResetWorkAfterLock(t *testing.T) {
+	now := time.Date(2026, 9, 10, 8, 0, 0, 0, time.UTC)
+	e := NewEngine(20*time.Minute, 20*time.Second)
+	e.now = func() time.Time { return now }
+	e.deadline = now.Add(e.Work)
+
+	now = now.Add(19 * time.Minute)
+	if ev := e.Tick(); ev != EventTick {
+		t.Fatalf("pre-lock tick = %v", ev)
+	}
+
+	now = now.Add(2 * time.Hour)
+	e.ResetWork()
+	if e.Phase() != PhaseWork {
+		t.Fatalf("phase after unlock = %v", e.Phase())
+	}
+	if got := e.Remaining(); got != 20*time.Minute {
+		t.Fatalf("remaining after unlock = %v", got)
+	}
+	if ev := e.Tick(); ev != EventTick {
+		t.Fatalf("tick after unlock = %v", ev)
+	}
+
+	e.Pause()
+	now = now.Add(time.Hour)
+	e.ResetWork()
+	if e.Phase() != PhaseWork {
+		t.Fatalf("paused unlock phase = %v", e.Phase())
+	}
+	if got := e.Remaining(); got != 20*time.Minute {
+		t.Fatalf("paused unlock remaining = %v", got)
+	}
+}

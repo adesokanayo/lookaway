@@ -122,6 +122,17 @@ func lookawayOnQuit() {
 	C.LookawayQuit()
 }
 
+//export lookawayOnUnlocked
+func lookawayOnUnlocked() {
+	a := cocoaApp
+	if a == nil {
+		return
+	}
+	a.engine.ResetWork()
+	a.overlay.Hide()
+	a.refresh()
+}
+
 func (a *App) refresh() {
 	remain := a.engine.Remaining()
 	status := formatClock(remain)
