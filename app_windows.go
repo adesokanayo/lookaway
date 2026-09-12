@@ -21,6 +21,9 @@ type App struct {
 }
 
 func startApp() {
+	if !claimInstance() {
+		return
+	}
 	setProcessDPIAware()
 	work, rest := loadIntervals()
 	a := &App{engine: NewEngine(work, rest)}

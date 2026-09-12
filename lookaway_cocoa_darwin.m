@@ -46,6 +46,20 @@ bool LookawayScreenIsLocked(void) {
 
 static LookawayTarget *gTarget;
 
+static BOOL LookawayClaimSoleInstance(void) {
+	NSString *bid = [[NSBundle mainBundle] bundleIdentifier];
+	if (![bid isEqualToString:@"com.adesokanayo.lookaway"]) {
+		return YES;
+	}
+	pid_t me = [[NSProcessInfo processInfo] processIdentifier];
+	for (NSRunningApplication *app in [NSRunningApplication runningApplicationsWithBundleIdentifier:bid]) {
+		if (app.processIdentifier != me) {
+			return NO;
+		}
+	}
+	return YES;
+}
+
 static NSTextField *label(NSString *text, NSColor *color, CGFloat size, BOOL bold, NSRect frame) {
 	NSTextField *f = [NSTextField labelWithString:text];
 	f.font = bold ? [NSFont boldSystemFontOfSize:size] : [NSFont systemFontOfSize:size];
@@ -148,6 +162,9 @@ void LookawayRunApp(void) {
 	@autoreleasepool {
 		[NSApplication sharedApplication];
 		[NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
+		if (!LookawayClaimSoleInstance()) {
+			return;
+		}
 		gTarget = [LookawayTarget new];
 		gStatus = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
 		NSImage *img = [NSImage imageWithSystemSymbolName:@"eye" accessibilityDescription:@"Lookaway"];

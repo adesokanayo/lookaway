@@ -27,6 +27,8 @@ cat > "$stage/Install Lookaway.command" << 'EOF'
 #!/bin/bash
 set -e
 cd "$(dirname "$0")"
+killall Lookaway 2>/dev/null || true
+sleep 1
 xattr -cr "Lookaway.app" || true
 rm -rf /Applications/Lookaway.app
 ditto "Lookaway.app" /Applications/Lookaway.app
@@ -81,12 +83,34 @@ tell application "Finder"
   end tell
 end tell
 EOF
+  cp "$root/packaging/AppIcon.icns" "$mount/.VolumeIcon.icns"
+  if command -v SetFile >/dev/null; then
+    SetFile -c icnC "$mount/.VolumeIcon.icns" || true
+    SetFile -a C "$mount" || true
+  fi
   sync
   hdiutil detach "$mount" -quiet || true
 fi
 
 hdiutil convert "$rw" -format UDZO -imagekey zlib-level=9 -o "$final" >/dev/null
 rm -f "$rw"
+
+set_file_icon() {
+  local icns="$1" dest="$2"
+  local script
+  script="$(mktemp -t lookaway-seticon).swift"
+  cat > "$script" << 'SWIFT'
+import AppKit
+guard CommandLine.arguments.count >= 3,
+      let img = NSImage(contentsOfFile: CommandLine.arguments[1]) else {
+  exit(1)
+}
+NSWorkspace.shared.setIcon(img, forFile: CommandLine.arguments[2], options: [])
+SWIFT
+  swift "$script" "$icns" "$dest" || true
+  rm -f "$script"
+}
+set_file_icon "$root/packaging/AppIcon.icns" "$final"
 
 ditto -c -k --keepParent "$app" "$dist/Lookaway-${version}-mac.zip"
 echo "Created $final"

@@ -55,6 +55,7 @@ var (
 	procSetTextColor     = gdi32.NewProc("SetTextColor")
 
 	procGetModuleHandleW                 = kernel32.NewProc("GetModuleHandleW")
+	procCreateMutexW                     = kernel32.NewProc("CreateMutexW")
 	procShellNotifyIconW                 = shell32.NewProc("Shell_NotifyIconW")
 	procPlaySoundW                       = winmm.NewProc("PlaySoundW")
 	procWTSRegisterSessionNotification   = wtsapi32.NewProc("WTSRegisterSessionNotification")
@@ -129,7 +130,23 @@ const (
 	idPause      = 1002
 	idSkip       = 1003
 	idQuit       = 1004
+
+	errorAlreadyExists = 183
 )
+
+var instanceMutex uintptr
+
+func claimInstance() bool {
+	h, _, err := procCreateMutexW.Call(0, 0, uintptr(unsafe.Pointer(utf16Ptr("Local\\LookawaySingleInstance"))))
+	if h == 0 {
+		return true
+	}
+	if err == windows.Errno(errorAlreadyExists) {
+		return false
+	}
+	instanceMutex = h
+	return true
+}
 
 type point struct {
 	x, y int32
