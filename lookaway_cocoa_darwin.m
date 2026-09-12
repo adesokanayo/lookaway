@@ -9,10 +9,13 @@ void lookawayOnPause(void);
 void lookawayOnSkip(void);
 void lookawayOnQuit(void);
 void lookawayOnUnlocked(void);
+void lookawayOnWelcomeDone(void);
 
 static NSStatusItem *gStatus;
 static NSMenuItem *gNextItem;
+static NSMenuItem *gStatsItem;
 static NSMenuItem *gPauseItem;
+static NSWindow *gWelcome;
 static NSMutableArray<NSWindow *> *gWindows;
 static NSMutableArray<NSTextField *> *gCounts;
 
@@ -23,6 +26,7 @@ static NSMutableArray<NSTextField *> *gCounts;
 - (void)pause:(id)sender { lookawayOnPause(); }
 - (void)skip:(id)sender { lookawayOnSkip(); }
 - (void)quit:(id)sender { lookawayOnQuit(); }
+- (void)gotIt:(id)sender { lookawayOnWelcomeDone(); }
 - (void)screenUnlocked:(NSNotification *)note {
 	(void)note;
 	lookawayOnUnlocked();
@@ -67,6 +71,8 @@ static NSTextField *label(NSString *text, NSColor *color, CGFloat size, BOOL bol
 	f.alignment = NSTextAlignmentCenter;
 	f.drawsBackground = NO;
 	f.frame = frame;
+	f.maximumNumberOfLines = 0;
+	f.lineBreakMode = NSLineBreakByWordWrapping;
 	return f;
 }
 
@@ -141,13 +147,54 @@ void LookawayUpdateOverlay(const char *secs) {
 	}
 }
 
-void LookawaySetMenu(const char *status, const char *next, const char *pause) {
+void LookawaySetMenu(const char *status, const char *next, const char *stats, const char *pause) {
 	gStatus.button.title = [NSString stringWithUTF8String:status];
 	gNextItem.title = [NSString stringWithUTF8String:next];
+	gStatsItem.title = [NSString stringWithUTF8String:stats];
 	gPauseItem.title = [NSString stringWithUTF8String:pause];
 }
 
+void LookawayHideWelcome(void) {
+	[gWelcome orderOut:nil];
+	[gWelcome close];
+	gWelcome = nil;
+}
+
+void LookawayShowWelcome(void) {
+	LookawayHideWelcome();
+	NSColor *bg = [NSColor colorWithSRGBRed:0.04 green:0.05 blue:0.07 alpha:1];
+	NSColor *fg = [NSColor colorWithSRGBRed:0.96 green:0.97 blue:0.98 alpha:1];
+	NSColor *muted = [NSColor colorWithSRGBRed:0.70 green:0.74 blue:0.78 alpha:1];
+	NSRect frame = NSMakeRect(0, 0, 460, 260);
+	NSPanel *panel = [[NSPanel alloc] initWithContentRect:frame
+		styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskNonactivatingPanel)
+		backing:NSBackingStoreBuffered
+		defer:NO];
+	panel.title = @"Lookaway";
+	panel.level = NSFloatingWindowLevel;
+	panel.opaque = YES;
+	panel.backgroundColor = bg;
+	panel.hidesOnDeactivate = NO;
+	panel.releasedWhenClosed = NO;
+	NSView *c = panel.contentView;
+	[c addSubview:label(@"Lookaway is in the menu bar.", fg, 18, YES, NSMakeRect(24, 190, 412, 28))];
+	[c addSubview:label(@"Look for the eye. Every 20 minutes the screen takes over for 20 seconds. Look about 20 feet away. That counts as one lookaway.", muted, 13, NO, NSMakeRect(24, 88, 412, 96))];
+	NSButton *ok = [NSButton buttonWithTitle:@"Got it" target:gTarget action:@selector(gotIt:)];
+	ok.bezelStyle = NSBezelStyleRounded;
+	ok.frame = NSMakeRect(170, 24, 120, 32);
+	[c addSubview:ok];
+	[panel center];
+	[panel orderFrontRegardless];
+	gWelcome = panel;
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 8 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+		if (gWelcome != nil) {
+			lookawayOnWelcomeDone();
+		}
+	});
+}
+
 void LookawayQuit(void) {
+	LookawayHideWelcome();
 	LookawayHideOverlay();
 	[NSApp terminate:nil];
 }
@@ -176,6 +223,9 @@ void LookawayRunApp(void) {
 		gNextItem = [[NSMenuItem alloc] initWithTitle:@"Next break" action:nil keyEquivalent:@""];
 		gNextItem.enabled = NO;
 		[menu addItem:gNextItem];
+		gStatsItem = [[NSMenuItem alloc] initWithTitle:@"Today 0 lookaways" action:nil keyEquivalent:@""];
+		gStatsItem.enabled = NO;
+		[menu addItem:gStatsItem];
 		[menu addItem:[NSMenuItem separatorItem]];
 		[menu addItem:[[NSMenuItem alloc] initWithTitle:@"Break now" action:@selector(breakNow:) keyEquivalent:@""]];
 		gPauseItem = [[NSMenuItem alloc] initWithTitle:@"Pause" action:@selector(pause:) keyEquivalent:@""];
@@ -187,6 +237,7 @@ void LookawayRunApp(void) {
 			it.target = gTarget;
 		}
 		gNextItem.target = nil;
+		gStatsItem.target = nil;
 		gStatus.menu = menu;
 
 		NSDistributedNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];

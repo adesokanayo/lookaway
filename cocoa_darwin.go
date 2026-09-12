@@ -58,6 +58,9 @@ func lookawayOnReady() {
 	work, rest := loadIntervals()
 	cocoaApp = &App{engine: NewEngine(work, rest), overlay: NewOverlay(nil)}
 	cocoaApp.refresh()
+	if needsWelcome() {
+		C.LookawayShowWelcome()
+	}
 	go func() {
 		t := time.NewTicker(250 * time.Millisecond)
 		defer t.Stop()
@@ -84,8 +87,10 @@ func lookawayOnTick() {
 	ev := a.engine.Tick()
 	switch ev {
 	case EventBreakStarted:
+		recordShown()
 		a.overlay.Show(a.engine.Remaining())
 	case EventBreakFinished:
+		recordCompleted()
 		a.overlay.Hide()
 	}
 	if a.engine.Phase() == PhaseBreak {
@@ -98,6 +103,7 @@ func lookawayOnTick() {
 func lookawayOnBreakNow() {
 	a := cocoaApp
 	if a != nil && a.engine.StartBreak() == EventBreakStarted {
+		recordShown()
 		a.overlay.Show(a.engine.Remaining())
 		a.refresh()
 	}
@@ -121,6 +127,7 @@ func lookawayOnPause() {
 func lookawayOnSkip() {
 	a := cocoaApp
 	if a != nil && a.engine.SkipBreak() == EventBreakFinished {
+		recordSkipped()
 		a.overlay.Hide()
 		a.refresh()
 	}
@@ -138,6 +145,12 @@ func lookawayOnUnlocked() {
 		return
 	}
 	a.onUnlocked()
+}
+
+//export lookawayOnWelcomeDone
+func lookawayOnWelcomeDone() {
+	markWelcome()
+	C.LookawayHideWelcome()
 }
 
 func (a *App) onUnlocked() {
@@ -161,9 +174,12 @@ func (a *App) refresh() {
 		next = "Paused " + formatClock(remain)
 		pause = "Resume"
 	}
-	cs, cn, cp := cstr(status), cstr(next), cstr(pause)
+	completed, skipped := todayCounts()
+	stats := formatTodayStats(completed, skipped)
+	cs, cn, ct, cp := cstr(status), cstr(next), cstr(stats), cstr(pause)
 	defer free(cs)
 	defer free(cn)
+	defer free(ct)
 	defer free(cp)
-	C.LookawaySetMenu(cs, cn, cp)
+	C.LookawaySetMenu(cs, cn, ct, cp)
 }
