@@ -2,6 +2,12 @@
 
 Every 20 minutes, the screen locks so you look ~20 feet away for 20 seconds.
 
+<img src="docs/menu-bar.png" alt="Lookaway in the menu bar" width="180">
+
+<img src="docs/menu.png" alt="Lookaway menu" width="360">
+
+<img src="docs/overlay.png" alt="Look away overlay" width="720">
+
 I built this because I sit on a laptop all day and my eyes get fried. Notifications were too easy to swipe away. I wanted something that actually takes the screen for 20 seconds.
 
 The 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds. The [American Optometric Association (AOA)](https://www.aoa.org/healthy-eyes/eye-and-vision-conditions/computer-vision-syndrome) and the [American Academy of Ophthalmology (AAO)](https://www.aao.org/eye-health/tips-prevention/computer-usage) recommend it for digital eye strain. A 2023 study found it eased symptoms; it is not a cure.
