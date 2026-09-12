@@ -4,6 +4,8 @@ Every 20 minutes, the screen locks so you look ~20 feet away for 20 seconds.
 
 <img src="docs/menu-bar.png" alt="Lookaway in the menu bar" width="180">
 
+<img src="docs/menu.png" alt="Lookaway menu" width="360">
+
 <img src="docs/overlay.png" alt="Look away overlay" width="720">
 
 I built this because I sit on a laptop all day and my eyes get fried. Notifications were too easy to swipe away. I wanted something that actually takes the screen for 20 seconds.
