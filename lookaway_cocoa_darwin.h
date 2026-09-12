@@ -1,6 +1,9 @@
 #pragma once
 
+#include <stdbool.h>
+
 void LookawayRunApp(void);
+bool LookawayScreenIsLocked(void);
 void LookawayShowOverlay(const char *secs);
 void LookawayUpdateOverlay(const char *secs);
 void LookawayHideOverlay(void);

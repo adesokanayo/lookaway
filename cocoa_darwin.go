@@ -4,7 +4,7 @@ package main
 
 /*
 #cgo CFLAGS: -fobjc-arc
-#cgo LDFLAGS: -framework Cocoa
+#cgo LDFLAGS: -framework Cocoa -framework CoreGraphics
 #include <stdlib.h>
 #include "lookaway_cocoa_darwin.h"
 */
@@ -50,6 +50,7 @@ func (o *Overlay) Hide() { C.LookawayHideOverlay() }
 type App struct {
 	engine  *Engine
 	overlay *Overlay
+	locked  bool
 }
 
 //export lookawayOnReady
@@ -70,6 +71,14 @@ func lookawayOnReady() {
 func lookawayOnTick() {
 	a := cocoaApp
 	if a == nil {
+		return
+	}
+	if C.LookawayScreenIsLocked() {
+		a.locked = true
+		return
+	}
+	if a.locked {
+		a.onUnlocked()
 		return
 	}
 	ev := a.engine.Tick()
@@ -128,6 +137,11 @@ func lookawayOnUnlocked() {
 	if a == nil {
 		return
 	}
+	a.onUnlocked()
+}
+
+func (a *App) onUnlocked() {
+	a.locked = false
 	a.engine.ResetWork()
 	a.overlay.Hide()
 	a.refresh()

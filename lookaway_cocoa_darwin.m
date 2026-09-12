@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import <CoreGraphics/CoreGraphics.h>
 #include "lookaway_cocoa_darwin.h"
 
 void lookawayOnReady(void);
@@ -22,7 +23,26 @@ static NSMutableArray<NSTextField *> *gCounts;
 - (void)pause:(id)sender { lookawayOnPause(); }
 - (void)skip:(id)sender { lookawayOnSkip(); }
 - (void)quit:(id)sender { lookawayOnQuit(); }
+- (void)screenUnlocked:(NSNotification *)note {
+	(void)note;
+	lookawayOnUnlocked();
+}
+- (void)didWake:(NSNotification *)note {
+	(void)note;
+	lookawayOnUnlocked();
+}
 @end
+
+bool LookawayScreenIsLocked(void) {
+	CFDictionaryRef dict = CGSessionCopyCurrentDictionary();
+	if (!dict) {
+		return false;
+	}
+	CFBooleanRef locked = CFDictionaryGetValue(dict, CFSTR("CGSSessionScreenIsLocked"));
+	bool isLocked = locked != NULL && CFBooleanGetValue(locked);
+	CFRelease(dict);
+	return isLocked;
+}
 
 static LookawayTarget *gTarget;
 
@@ -153,21 +173,16 @@ void LookawayRunApp(void) {
 		gStatus.menu = menu;
 
 		NSDistributedNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
-		[dnc addObserverForName:@"com.apple.screenIsUnlocked"
-		                 object:nil
-		                  queue:[NSOperationQueue mainQueue]
-		             usingBlock:^(NSNotification *note) {
-			             (void)note;
-			             lookawayOnUnlocked();
-		             }];
+		[dnc addObserver:gTarget
+		        selector:@selector(screenUnlocked:)
+		            name:@"com.apple.screenIsUnlocked"
+		          object:nil
+		suspensionBehavior:NSNotificationSuspensionBehaviorDeliverImmediately];
 		[[[NSWorkspace sharedWorkspace] notificationCenter]
-			addObserverForName:NSWorkspaceDidWakeNotification
-			            object:nil
-			             queue:[NSOperationQueue mainQueue]
-			        usingBlock:^(NSNotification *note) {
-				        (void)note;
-				        lookawayOnUnlocked();
-			        }];
+			addObserver:gTarget
+			   selector:@selector(didWake:)
+			       name:NSWorkspaceDidWakeNotification
+			     object:nil];
 
 		lookawayOnReady();
 		[NSApp run];
