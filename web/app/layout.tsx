@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   title: "Lookaway",
   description:
     "Every 20 minutes the screen takes over so you look about 20 feet away for 20 seconds.",
+  applicationName: "Lookaway",
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
