@@ -47,6 +47,10 @@ func startApp() {
 	notifyIcon(nimAdd, &a.nid)
 	registerSessionNotify(a.hwnd)
 	a.refresh()
+	if needsWelcome() {
+		showWelcomeBox(a.hwnd)
+		markWelcome()
+	}
 
 	go func() {
 		ticker := time.NewTicker(250 * time.Millisecond)
@@ -72,8 +76,10 @@ func (a *App) onUnlocked() {
 func (a *App) handleEvent(ev Event) {
 	switch ev {
 	case EventBreakStarted:
+		recordShown()
 		a.overlay.Show(a.engine.Remaining())
 	case EventBreakFinished:
+		recordCompleted()
 		a.overlay.Hide()
 	}
 	if a.engine.Phase() == PhaseBreak {
@@ -111,6 +117,7 @@ func (a *App) showMenu() {
 	}
 
 	appendMenu(menu, mfString|mfGrayed, 0, status)
+	appendMenu(menu, mfString|mfGrayed, 0, formatTodayStats(todayCounts()))
 	appendMenu(menu, mfSeparator, 0, "")
 	appendMenu(menu, mfString, idStartBreak, "Break now")
 	appendMenu(menu, mfString, idPause, pause)
@@ -128,6 +135,7 @@ func (a *App) onCommand(id uintptr) {
 	switch id {
 	case idStartBreak:
 		if a.engine.StartBreak() == EventBreakStarted {
+			recordShown()
 			a.overlay.Show(a.engine.Remaining())
 		}
 	case idPause:
@@ -138,6 +146,7 @@ func (a *App) onCommand(id uintptr) {
 		}
 	case idSkip:
 		if a.engine.SkipBreak() == EventBreakFinished {
+			recordSkipped()
 			a.overlay.Hide()
 		}
 	case idQuit:

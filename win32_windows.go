@@ -56,6 +56,7 @@ var (
 
 	procGetModuleHandleW                 = kernel32.NewProc("GetModuleHandleW")
 	procCreateMutexW                     = kernel32.NewProc("CreateMutexW")
+	procMessageBoxW                      = user32.NewProc("MessageBoxW")
 	procShellNotifyIconW                 = shell32.NewProc("Shell_NotifyIconW")
 	procPlaySoundW                       = winmm.NewProc("PlaySoundW")
 	procWTSRegisterSessionNotification   = wtsapi32.NewProc("WTSRegisterSessionNotification")
@@ -132,7 +133,19 @@ const (
 	idQuit       = 1004
 
 	errorAlreadyExists = 183
+	mbOK               = 0
+	mbTopmost          = 0x00040000
+	mbIconInformation  = 0x00000040
 )
+
+func showWelcomeBox(hwnd uintptr) {
+	procMessageBoxW.Call(
+		hwnd,
+		uintptr(unsafe.Pointer(utf16Ptr("Lookaway is in the tray by the clock.\n\nEvery 20 minutes the screen takes over for 20 seconds. Look about 20 feet away. That counts as one lookaway."))),
+		uintptr(unsafe.Pointer(utf16Ptr("Lookaway"))),
+		mbOK|mbTopmost|mbIconInformation,
+	)
+}
 
 var instanceMutex uintptr
 
