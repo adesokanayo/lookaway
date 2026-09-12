@@ -3,18 +3,18 @@
 Every 20 minutes, the screen locks so you look ~20 feet away for 20 seconds.
 
 <p align="center">
-  <img src="docs/menu-bar.png" alt="Lookaway in the menu bar" width="180"><br>
-  The little eye in the menu bar. Time until the next break.
+  This is the Small Eye icon that counts down the timer.<br>
+  <img src="docs/menu-bar.png" alt="Lookaway in the menu bar">
 </p>
 
 <p align="center">
-  <img src="docs/menu.png" alt="Lookaway menu" width="360"><br>
-  Click it for Break now, Pause, Skip, and today’s lookaways.
+  This is the menu.<br>
+  <img src="docs/menu.png" alt="Lookaway menu" width="360">
 </p>
 
 <p align="center">
-  <img src="docs/overlay.png" alt="Look away overlay" width="720"><br>
-  Every 20 minutes this takes the screen. Look about 20 feet away.
+  This is the Overlay you will see.<br>
+  <img src="docs/overlay.png" alt="Look away overlay" width="720">
 </p>
 
 I built this because I sit on a laptop all day and my eyes get fried. Notifications were too easy to swipe away. I wanted something that actually takes the screen for 20 seconds.
