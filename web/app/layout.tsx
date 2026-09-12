@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Fraunces, Source_Sans_3 } from "next/font/google";
+import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-const display = Fraunces({
+const display = Source_Serif_4({
   variable: "--font-display-loaded",
   subsets: ["latin"],
 });
