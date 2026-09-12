@@ -7,3 +7,5 @@
 *.out
 .DS_Store
 packaging/AppIcon.iconset/
+web/node_modules/
+web/.next/
