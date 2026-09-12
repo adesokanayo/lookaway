@@ -3,13 +3,21 @@ Lookaway is a app that helps you to take care of your eyes for Professionals who
 
 </br>
 Every 20 minutes, the screen locks so you look ~20 feet away for 20 seconds.
-</br>
-<img src="docs/menu-bar.png" alt="Lookaway in the menu bar" width="180">
 
-<img src="docs/menu.png" alt="Lookaway menu" width="360">
-This is the screen overlay , it takes over your screen for 20 seconds so you look ~20 feet away.Open the window and look out.
+<p align="center">
+  This is the Small Eye icon that counts down the timer.<br>
+  <img src="docs/menu-bar.png" alt="Lookaway in the menu bar">
+</p>
 
-<img src="docs/overlay.png" alt="Look away overlay" width="720">
+<p align="center">
+  This is the menu.<br>
+  <img src="docs/menu.png" alt="Lookaway menu" width="360">
+</p>
+
+<p align="center">
+  This is the Overlay you will see.<br>
+  <img src="docs/overlay.png" alt="Look away overlay" width="720">
+</p>
 
 
 
