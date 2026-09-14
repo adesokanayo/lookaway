@@ -4,6 +4,8 @@
 
 void LookawayRunApp(void);
 bool LookawayScreenIsLocked(void);
+bool LookawayInputIsQuiet(void);
+void LookawaySetEye(bool warning, bool flash);
 void LookawayShowOverlay(const char *secs);
 void LookawayUpdateOverlay(const char *secs);
 void LookawayHideOverlay(void);

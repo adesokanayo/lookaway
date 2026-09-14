@@ -25,6 +25,17 @@ func formatTodayStats(completed, skipped int) string {
 	return s
 }
 
+func warningSecond(remain time.Duration) int {
+	if remain <= 0 || remain > 5*time.Second {
+		return 0
+	}
+	n := int(remain / time.Second)
+	if n < 1 {
+		return 1
+	}
+	return n
+}
+
 func formatSeconds(d time.Duration) string {
 	if d < 0 {
 		d = 0

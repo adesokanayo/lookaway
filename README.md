@@ -31,6 +31,8 @@ The 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds. The [Amer
 
 Unlocking the machine (or waking from sleep) starts a fresh 20 minutes. Lock-screen time does not count.
 
+In the last 5 seconds the eye counts down. Then Lookaway waits up to a minute for a pause before taking the screen.
+
 **Gophers**
 
 ```bash
