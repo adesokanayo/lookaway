@@ -3,9 +3,8 @@
 package main
 
 import (
+	"time"
 	"unsafe"
-
-	"golang.org/x/sys/windows"
 )
 
 var (

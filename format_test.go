@@ -18,7 +18,10 @@ func TestFormatClock(t *testing.T) {
 	if got := warningSecond(5 * time.Second); got != 5 {
 		t.Fatalf("warn 5s = %d", got)
 	}
-	if got := warningSecond(1500 * time.Millisecond); got != 1 {
+	if got := warningSecond(4900 * time.Millisecond); got != 5 {
+		t.Fatalf("warn 4.9s = %d", got)
+	}
+	if got := warningSecond(1500 * time.Millisecond); got != 2 {
 		t.Fatalf("warn 1.5s = %d", got)
 	}
 	if got := warningSecond(6 * time.Second); got != 0 {
