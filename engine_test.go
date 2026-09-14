@@ -24,6 +24,13 @@ func TestEngineStartsWorkThenBreaks(t *testing.T) {
 	}
 
 	now = now.Add(time.Minute)
+	if ev := e.Tick(); ev != EventSeekStarted {
+		t.Fatalf("expected seek start, got %v", ev)
+	}
+	if e.Phase() != PhaseSeek {
+		t.Fatalf("phase after work = %v", e.Phase())
+	}
+	now = now.Add(e.Seek)
 	if ev := e.Tick(); ev != EventBreakStarted {
 		t.Fatalf("expected break start, got %v", ev)
 	}
@@ -112,5 +119,42 @@ func TestResetWorkAfterLock(t *testing.T) {
 	}
 	if got := e.Remaining(); got != 20*time.Minute {
 		t.Fatalf("paused unlock remaining = %v", got)
+	}
+}
+
+func TestSeekFiresOnQuietOrTimeout(t *testing.T) {
+	now := time.Date(2026, 9, 10, 8, 0, 0, 0, time.UTC)
+	e := NewEngine(20*time.Minute, 20*time.Second)
+	e.now = func() time.Time { return now }
+	e.deadline = now.Add(e.Work)
+	e.Seek = time.Minute
+
+	now = now.Add(e.Work)
+	if ev := e.Tick(); ev != EventSeekStarted {
+		t.Fatalf("seek = %v", ev)
+	}
+	if ev := e.FireBreak(); ev != EventBreakStarted {
+		t.Fatalf("quiet fire = %v", ev)
+	}
+	if e.Phase() != PhaseBreak {
+		t.Fatalf("phase = %v", e.Phase())
+	}
+
+	e = NewEngine(20*time.Minute, 20*time.Second)
+	e.now = func() time.Time { return now }
+	e.deadline = now.Add(e.Work)
+	e.Seek = time.Minute
+	now = now.Add(e.Work)
+	e.Tick()
+	e.Pause()
+	if e.Phase() != PhasePaused {
+		t.Fatalf("pause during seek = %v", e.Phase())
+	}
+	e.Resume()
+	if e.Phase() != PhaseWork {
+		t.Fatalf("resume after seek pause = %v", e.Phase())
+	}
+	if got := e.Remaining(); got != e.Work {
+		t.Fatalf("resume remaining = %v", got)
 	}
 }

@@ -37,6 +37,34 @@ static NSMutableArray<NSTextField *> *gCounts;
 }
 @end
 
+bool LookawayInputIsQuiet(void) {
+	double idle = CGEventSourceSecondsSinceLastEventType(
+		kCGEventSourceStateCombinedSessionState,
+		(CGEventType)(~0U));
+	if (idle < 2.0) {
+		return false;
+	}
+	if ([NSEvent pressedMouseButtons] != 0) {
+		return false;
+	}
+	NSEventModifierFlags mods = [NSEvent modifierFlags];
+	if (mods & (NSEventModifierFlagCommand | NSEventModifierFlagControl | NSEventModifierFlagShift)) {
+		return false;
+	}
+	return true;
+}
+
+void LookawaySetEye(bool warning, bool flash) {
+	if (!gStatus) {
+		return;
+	}
+	NSString *name = (warning && flash) ? @"eye.fill" : @"eye";
+	NSImage *img = [NSImage imageWithSystemSymbolName:name accessibilityDescription:@"Lookaway"];
+	img.template = YES;
+	gStatus.button.image = img;
+	gStatus.button.alphaValue = (warning && !flash) ? 0.35 : 1.0;
+}
+
 bool LookawayScreenIsLocked(void) {
 	CFDictionaryRef dict = CGSessionCopyCurrentDictionary();
 	if (!dict) {

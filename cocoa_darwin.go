@@ -84,7 +84,7 @@ func lookawayOnTick() {
 		a.onUnlocked()
 		return
 	}
-	ev := a.engine.Tick()
+	ev := nextEvent(a.engine)
 	switch ev {
 	case EventBreakStarted:
 		recordShown()
@@ -160,12 +160,27 @@ func (a *App) onUnlocked() {
 	a.refresh()
 }
 
+func inputIsQuiet() bool {
+	return bool(C.LookawayInputIsQuiet())
+}
+
 func (a *App) refresh() {
 	remain := a.engine.Remaining()
 	status := formatClock(remain)
 	next := "Next break " + formatClock(remain)
 	pause := "Pause"
+	warn, flash := false, false
 	switch a.engine.Phase() {
+	case PhaseWork:
+		if w := warningSecond(remain); w > 0 {
+			status = formatSeconds(time.Duration(w) * time.Second)
+			next = "Break soon"
+			warn = true
+			flash = time.Now().UnixMilli()/400%2 == 0
+		}
+	case PhaseSeek:
+		status = "…"
+		next = "Waiting for a pause"
 	case PhaseBreak:
 		status = formatSeconds(remain) + "s"
 		next = "Break " + formatSeconds(remain) + "s"
@@ -174,6 +189,7 @@ func (a *App) refresh() {
 		next = "Paused " + formatClock(remain)
 		pause = "Resume"
 	}
+	C.LookawaySetEye(C.bool(warn), C.bool(flash))
 	completed, skipped := todayCounts()
 	stats := formatTodayStats(completed, skipped)
 	cs, cn, ct, cp := cstr(status), cstr(next), cstr(stats), cstr(pause)

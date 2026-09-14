@@ -56,7 +56,7 @@ func startApp() {
 		ticker := time.NewTicker(250 * time.Millisecond)
 		defer ticker.Stop()
 		for range ticker.C {
-			ev := a.engine.Tick()
+			ev := nextEvent(a.engine)
 			postMessage(a.hwnd, wmAppRefresh, uintptr(ev), 0)
 		}
 	}()
@@ -92,6 +92,12 @@ func (a *App) refresh() {
 	remain := a.engine.Remaining()
 	tip := "Lookaway " + formatClock(remain)
 	switch a.engine.Phase() {
+	case PhaseWork:
+		if w := warningSecond(remain); w > 0 {
+			tip = "Lookaway " + formatSeconds(time.Duration(w)*time.Second)
+		}
+	case PhaseSeek:
+		tip = "Lookaway waiting for a pause"
 	case PhaseBreak:
 		tip = "Lookaway " + formatSeconds(remain) + "s"
 	case PhasePaused:
@@ -106,13 +112,20 @@ func (a *App) showMenu() {
 	procGetCursorPos.Call(uintptr(unsafe.Pointer(&pt)))
 	menu, _, _ := procCreatePopupMenu.Call()
 
-	status := "Next " + formatClock(a.engine.Remaining())
+	remain := a.engine.Remaining()
+	status := "Next " + formatClock(remain)
 	pause := "Pause"
 	switch a.engine.Phase() {
+	case PhaseWork:
+		if w := warningSecond(remain); w > 0 {
+			status = "Break soon " + formatSeconds(time.Duration(w)*time.Second)
+		}
+	case PhaseSeek:
+		status = "Waiting for a pause"
 	case PhaseBreak:
-		status = "Break " + formatSeconds(a.engine.Remaining()) + "s"
+		status = "Break " + formatSeconds(remain) + "s"
 	case PhasePaused:
-		status = "Paused " + formatClock(a.engine.Remaining())
+		status = "Paused " + formatClock(remain)
 		pause = "Resume"
 	}
 
